@@ -3,10 +3,7 @@ package com.example.demo.config;
 import com.example.demo.repository.entity.SensorEntity;
 import com.example.demo.service.SensorService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,29 +31,36 @@ public class MqttConfig {
         options.setCleanSession(true);
         client.connect(options);
 
-        client.subscribe("sensors", this::handleMessage);
-        client.subscribe("fan", this::handleMessage);
-        client.subscribe("airconditioner", this::handleMessage);
-        client.subscribe("lightblub", this::handleMessage);
+        client.subscribe("sensors", this::handleSensorMessage);
+        client.subscribe("fan", this::handleDeviceMessage);
+        client.subscribe("airConditioner", this::handleDeviceMessage);
+        client.subscribe("lightbulb", this::handleDeviceMessage);
+        client.subscribe("warningLight", this::handleDeviceMessage);
         return client;
     }
-    private void handleMessage(String topic, MqttMessage message) {
+
+    private void handleSensorMessage(String topic, MqttMessage message) {
         String payload = new String(message.getPayload());
-        SensorEntity sensorData = parseMessage(payload);
-        // Set current timestamp if it's null
-        if (sensorData.getTimestamp() == null) {
-            sensorData.setTimestamp(LocalDateTime.now());
-        }
-        sensorService.saveSensorData(sensorData);
-    }
-    private SensorEntity parseMessage(String message) {
-        SensorEntity sensorData = new SensorEntity();
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            sensorData = objectMapper.readValue(message, SensorEntity.class);
+            SensorEntity sensorData = objectMapper.readValue(payload, SensorEntity.class);
+
+            // Set current timestamp if it's null
+            if (sensorData.getTimestamp() == null) {
+                sensorData.setTimestamp(LocalDateTime.now());
+            }
+
+            sensorService.saveSensorData(sensorData);
         } catch (Exception e) {
+            System.err.println("Failed to parse sensor data: " + payload);
             e.printStackTrace();
         }
-        return sensorData;
+    }
+
+    private void handleDeviceMessage(String topic, MqttMessage message) {
+        String payload = new String(message.getPayload());
+        System.out.println("Received command on topic [" + topic + "]: " + payload);
+        // Xử lý lệnh điều khiển thiết bị nếu cần
+        // Bạn có thể cập nhật trạng thái thiết bị trong cơ sở dữ liệu hoặc thực hiện hành động khác
     }
 }

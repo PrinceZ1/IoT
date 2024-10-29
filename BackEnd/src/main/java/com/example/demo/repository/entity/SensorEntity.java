@@ -20,6 +20,9 @@ public class SensorEntity {
     @Column(name = "light")
     private Integer light;
 
+    @Column(name="wind")
+    private Integer wind;
+
     @Column(name = "timestamp")
     private LocalDateTime timestamp;
 
@@ -43,6 +46,10 @@ public class SensorEntity {
         return timestamp;
     }
 
+    public Integer getWind() {
+        return wind;
+    }
+
     public void setHumidity(Integer humidity) {
         this.humidity = humidity;
     }
@@ -57,6 +64,10 @@ public class SensorEntity {
 
     public void setTemperature(Integer temperature) {
         this.temperature = temperature;
+    }
+
+    public void setWind(Integer wind) {
+        this.wind = wind;
     }
 
     public void setTimestamp(LocalDateTime timestamp) {

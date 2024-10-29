@@ -21,7 +21,7 @@ import {
   faFan,
   faWind,
   faLightbulb,
-  faExclamationTriangle, // Import icon cảnh báo
+  faExclamationTriangle,
 } from "@fortawesome/free-solid-svg-icons";
 import { tokens } from "../../theme";
 
@@ -116,13 +116,13 @@ function Dashboard() {
     return "#ffffff";
   };
 
-  const getWindSpeedColor = (windSpeed) => {
-    if (windSpeed < 1) return "#e0f7fa";
-    if (windSpeed < 3) return "#80deea";
-    if (windSpeed < 7) return "#26c6da";
-    if (windSpeed < 12) return "#00acc1";
-    if (windSpeed < 18) return "#00838f";
-    if (windSpeed < 24) return "#006064";
+  const getWindSpeedColor = (wind) => {
+    if (wind < 1) return "#e0f7fa";
+    if (wind < 3) return "#80deea";
+    if (wind < 7) return "#26c6da";
+    if (wind < 12) return "#00acc1";
+    if (wind < 18) return "#00838f";
+    if (wind < 24) return "#006064";
     return "#004d40";
   };
 
@@ -130,17 +130,17 @@ function Dashboard() {
     fan: false,
     airConditioner: false,
     lightbulb: false,
-    warningLight: false, // Thêm trạng thái cho đèn cảnh báo
+    warningLight: false,
   });
 
   const [sensorData, setSensorData] = useState({
     temperature: null,
     humidity: null,
     light: null,
-    windSpeed: null,
+    wind: null,
   });
 
-  const [shouldBlink, setShouldBlink] = useState(false); // Trạng thái để điều khiển nhấp nháy
+  const [shouldBlink, setShouldBlink] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -148,11 +148,11 @@ function Dashboard() {
       try {
         const response = await axios.get("http://localhost:8080/sensor/latest");
         if (isMounted) {
-          const { temperature, humidity, light, windSpeed } = response.data;
-          setSensorData({ temperature, humidity, light, windSpeed });
+          const { temperature, humidity, light, wind } = response.data;
+          setSensorData({ temperature, humidity, light, wind });
 
-          // Kiểm tra giá trị độ ẩm để cập nhật trạng thái nhấp nháy
-          if (humidity > 70) {
+
+          if (wind > 70) {
             setShouldBlink(true);
           } else {
             setShouldBlink(false);
@@ -314,12 +314,12 @@ function Dashboard() {
           />
         </Box>
 
-        {/* Wind Speed
+        {/* Wind Speed */}
         <Box
           gridColumn="span 3"
           sx={{
             background: `linear-gradient(to right, ${getWindSpeedColor(
-              sensorData.windSpeed
+              sensorData.wind
             )}, ${colors.gray[300]})`,
             borderRadius: "12px",
             boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
@@ -331,9 +331,7 @@ function Dashboard() {
         >
           <Box>
             <Typography variant="h3" fontWeight="bold" color={colors.gray[800]}>
-              {sensorData.windSpeed
-                ? `${sensorData.windSpeed} m/s`
-                : "Loading..."}
+              {sensorData.wind ? `${sensorData.wind} m/s` : "Loading..."}
             </Typography>
             <Typography variant="subtitle1" color={colors.gray[700]}>
               Wind Speed
@@ -346,7 +344,7 @@ function Dashboard() {
               marginLeft: "16px",
             }}
           />
-        </Box> */}
+        </Box>
 
         {/* ---------------- Row 2 ---------------- */}
 
@@ -383,7 +381,7 @@ function Dashboard() {
           </Typography>
 
           <Box display="flex" flexDirection="column" gap="16px">
-            {/* Warning Light
+            {/* Warning Light */}
             <Box
               display="flex"
               alignItems="center"
@@ -448,7 +446,7 @@ function Dashboard() {
                 }
                 labelPlacement="start"
               />
-            </Box> */}
+            </Box>
             {/* Fan Control */}
             <Box
               display="flex"

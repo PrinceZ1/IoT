@@ -24,17 +24,20 @@ const LineChartComponent = ({ isDashboard = false }) => {
       fetch("http://localhost:8080/sensor/latest")
         .then((response) => response.json())
         .then((sensorData) => {
-          const { temperature, humidity, light } = sensorData;
+          const { temperature, humidity, light, wind } = sensorData;
 
-          setData((prevData) => [
-            ...prevData,
-            {
-              time: new Date().toLocaleTimeString(),
-              temperature,
-              humidity,
-              light,
-            },
-          ].slice(-5));
+          setData((prevData) =>
+            [
+              ...prevData,
+              {
+                time: new Date().toLocaleTimeString(),
+                temperature,
+                humidity,
+                light,
+                wind,
+              },
+            ].slice(-5)
+          );
         })
         .catch((error) => {
           console.error("Error fetching data from API:", error);
@@ -46,18 +49,38 @@ const LineChartComponent = ({ isDashboard = false }) => {
 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
+      const temperaturePayload = payload.find((p) => p.dataKey === "temperature");
+      const humidityPayload = payload.find((p) => p.dataKey === "humidity");
+      const lightPayload = payload.find((p) => p.dataKey === "light");
+      const windPayload = payload.find((p) => p.dataKey === "wind");
+
       return (
-        <div style={{
-          backgroundColor: colors.primary[500],
-          padding: '10px',
-          borderRadius: '5px',
-          color: 'white',
-          border: `1px solid ${colors.gray[200]}`,
-        }}>
-          <p style={{ fontWeight: 'bold', fontSize: '14px' }}>{`Time: ${payload[0].payload.time}`}</p>
-          <p style={{ color: "#FF6F61", fontSize: '12px' }}>{`Temperature: ${payload[0].value}°C`}</p>
-          <p style={{ color: "#1E88E5", fontSize: '12px' }}>{`Humidity: ${payload[1].value}%`}</p>
-          <p style={{ color: "#FFEB3B", fontSize: '12px' }}>{`Light: ${payload[2].value} Lux`}</p>
+        <div
+          style={{
+            backgroundColor: colors.primary[500],
+            padding: "10px",
+            borderRadius: "5px",
+            color: "white",
+            border: `1px solid ${colors.gray[200]}`,
+          }}
+        >
+          <p style={{ fontWeight: "bold", fontSize: "14px" }}>
+            {`Time: ${payload[0].payload.time}`}
+          </p>
+          <p style={{ color: "#FF6F61", fontSize: "12px" }}>
+            {`Temperature: ${
+              temperaturePayload ? temperaturePayload.value : "N/A"
+            }°C`}
+          </p>
+          <p style={{ color: "#1E88E5", fontSize: "12px" }}>
+            {`Humidity: ${humidityPayload ? humidityPayload.value : "N/A"}%`}
+          </p>
+          <p style={{ color: "#FFEB3B", fontSize: "12px" }}>
+            {`Light: ${lightPayload ? lightPayload.value : "N/A"} Lux`}
+          </p>
+          <p style={{ color: "#00C49F", fontSize: "12px" }}>
+            {`Wind: ${windPayload ? windPayload.value : "N/A"} m/s`}
+          </p>
         </div>
       );
     }
@@ -66,11 +89,40 @@ const LineChartComponent = ({ isDashboard = false }) => {
 
   return (
     <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+      <LineChart
+        data={data}
+        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+      >
         <CartesianGrid strokeDasharray="3 3" stroke={colors.gray[400]} />
-        <XAxis dataKey="time" tick={{ fill: colors.gray[100], fontSize: 12 }} />
-        <YAxis yAxisId="left" domain={[0, 100]} tick={{ fill: colors.gray[100], fontSize: 12 }} />
-        <YAxis yAxisId="right" orientation="right" domain={[0, 1000]} tick={{ fill: colors.gray[100], fontSize: 12 }} />
+        <XAxis
+          dataKey="time"
+          tick={{ fill: colors.gray[100], fontSize: 12 }}
+        />
+        <YAxis
+          yAxisId="left"
+          domain={[0, 100]}
+          tick={{ fill: colors.gray[100], fontSize: 12 }}
+        />
+        <YAxis
+          yAxisId="right"
+          orientation="right"
+          domain={[0, 1000]}
+          tick={{ fill: colors.gray[100], fontSize: 12 }}
+        />
+        <YAxis
+          yAxisId="windAxis"
+          orientation="right"
+          domain={[0, 100]}
+          axisLine={false}
+          tickLine={false}
+          tick={{ fill: colors.gray[100], fontSize: 12 }}
+          label={{
+            value: "Wind (m/s)",
+            angle: 90,
+            position: "insideRight",
+            fill: colors.gray[100],
+          }}
+        />
         <Tooltip content={<CustomTooltip />} />
         <Legend verticalAlign="top" align="right" />
         <Line
@@ -96,6 +148,14 @@ const LineChartComponent = ({ isDashboard = false }) => {
           stroke="#FFEB3B"
           activeDot={{ r: 8 }}
           dot={{ stroke: "#FFEB3B", strokeWidth: 2 }}
+        />
+        <Line
+          yAxisId="windAxis"
+          type="monotone"
+          dataKey="wind"
+          stroke="#00C49F"
+          activeDot={{ r: 8 }}
+          dot={{ stroke: "#00C49F", strokeWidth: 2 }}
         />
       </LineChart>
     </ResponsiveContainer>

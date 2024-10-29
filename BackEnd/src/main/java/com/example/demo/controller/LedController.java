@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.CountResponse;
 import com.example.demo.model.LedDTO;
 import com.example.demo.service.LedService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,5 +37,11 @@ public class LedController {
         } catch (Exception e) {
             return new ResponseEntity<>("Điều khiển LED không thành công. Lỗi: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+    @GetMapping("/led/warningCount")
+    public ResponseEntity<CountResponse> getWarningCount() {
+        int count = ledService.getWarningCountForToday();
+        CountResponse response = new CountResponse(count);
+        return ResponseEntity.ok(response);
     }
 }

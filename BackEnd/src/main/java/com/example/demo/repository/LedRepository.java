@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,5 +28,7 @@ public interface LedRepository extends JpaRepository<LedEntity, Long> {
                                  @Param("hour") Integer hour,
                                  @Param("minute") Integer minute,
                                  Pageable pageable);
-
+    // Phương thức mới để đếm số lần bật cảnh báo trong ngày
+    @Query("SELECT COUNT(l) FROM LedEntity l WHERE l.active = 'on' AND DATE(l.timestamp) = :date")
+    int countWarningsByDate(@Param("date") LocalDate date);
 }

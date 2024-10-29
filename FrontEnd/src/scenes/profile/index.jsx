@@ -95,7 +95,7 @@ const Profile = () => {
             {
               icon: faGithub,
               label: "GitHub",
-              href: "https://github.com/PrinceZ1/IoT-System.git",
+              href: "https://github.com/PrinceZ1/IoT",
             },
           ].map((item) => (
             <Button

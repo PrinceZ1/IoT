@@ -32,6 +32,7 @@ public class SensorServiceImpl implements SensorService {
         Integer temperature = params.containsKey("temperature") ? Integer.valueOf(params.get("temperature").toString()) : null;
         Integer humidity = params.containsKey("humidity") ? Integer.valueOf(params.get("humidity").toString()) : null;
         Integer light = params.containsKey("light") ? Integer.valueOf(params.get("light").toString()) : null;
+        Integer wind = params.containsKey("wind") ? Integer.valueOf(params.get("wind").toString()) : null;
 
         Integer year = null;
         Integer month = null;

@@ -7,6 +7,7 @@ public class SensorDTO {
     private Integer temperature;
     private Integer humidity;
     private Integer light;
+    private Integer wind;
     private LocalDateTime timestamp;
 
     public Long getId() {
@@ -23,6 +24,10 @@ public class SensorDTO {
 
     public Integer getTemperature() {
         return temperature;
+    }
+
+    public Integer getWind() {
+        return wind;
     }
 
     public LocalDateTime getTimestamp() {
@@ -47,6 +52,10 @@ public class SensorDTO {
     public SensorDTO setTemperature(Integer temperature) {
         this.temperature = temperature;
         return this;
+    }
+
+    public void setWind(Integer wind) {
+        this.wind = wind;
     }
 
     public SensorDTO setTimestamp(LocalDateTime timestamp) {

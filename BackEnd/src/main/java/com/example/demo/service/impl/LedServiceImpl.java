@@ -22,7 +22,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -139,5 +138,9 @@ public class LedServiceImpl implements LedService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to control : " + e.getMessage());
         }
     }
-
+    @Override
+    public int getWarningCountForToday() {
+        LocalDate today = LocalDate.now();
+        return ledRepository.countWarningsByDate(today);
+    }
 }

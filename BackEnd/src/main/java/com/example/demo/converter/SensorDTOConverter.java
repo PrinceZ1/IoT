@@ -18,6 +18,7 @@ public class SensorDTOConverter {
         dto.setTemperature(entity.getTemperature() != null ? entity.getTemperature() : 0);
         dto.setHumidity(entity.getHumidity() != null ? entity.getHumidity() : 0);
         dto.setLight(entity.getLight() != null ? entity.getLight() : 0);
+        dto.setWind(entity.getWind() != null ? entity.getWind() : 0);
 
         // Giữ LocalDateTime nếu không null
         dto.setTimestamp(entity.getTimestamp()); // Timestamp được giữ nguyên kiểu LocalDateTime

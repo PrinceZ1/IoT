@@ -1,9 +1,7 @@
 package com.example.demo.converter;
 
 import com.example.demo.model.LedDTO;
-import com.example.demo.model.SensorDTO;
 import com.example.demo.repository.entity.LedEntity;
-import com.example.demo.repository.entity.SensorEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

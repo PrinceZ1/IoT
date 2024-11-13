@@ -15,20 +15,14 @@ public interface SensorRepository extends JpaRepository<SensorEntity, Long> {
             + "(:temperature IS NULL OR s.temperature = :temperature) "
             + "AND (:humidity IS NULL OR s.humidity = :humidity) "
             + "AND (:light IS NULL OR s.light = :light) "
-            + "AND (:year IS NULL OR FUNCTION('YEAR', s.timestamp) = :year) "
-            + "AND (:month IS NULL OR FUNCTION('MONTH', s.timestamp) = :month) "
-            + "AND (:day IS NULL OR FUNCTION('DAY', s.timestamp) = :day) "
-            + "AND (:hour IS NULL OR FUNCTION('HOUR', s.timestamp) = :hour) "
-            + "AND (:minute IS NULL OR FUNCTION('MINUTE', s.timestamp) = :minute)")
-    Page<SensorEntity> findByParams(@Param("temperature") Integer temperature,
-                                    @Param("humidity") Integer humidity,
-                                    @Param("light") Integer light,
-                                    @Param("year") Integer year,
-                                    @Param("month") Integer month,
-                                    @Param("day") Integer day,
-                                    @Param("hour") Integer hour,
-                                    @Param("minute") Integer minute,
-                                    Pageable pageable);
+            + "AND (:wind IS NULL OR s.wind = :wind) "
+            + "AND (:timestamp IS NULL OR s.timestamp = :timestamp)")
+    Page<SensorEntity> findByExactTimestamp(@Param("temperature") Integer temperature,
+                                            @Param("humidity") Integer humidity,
+                                            @Param("light") Integer light,
+                                            @Param("wind") Integer wind,
+                                            @Param("timestamp") LocalDateTime timestamp,
+                                            Pageable pageable);
 
     SensorEntity findTopByOrderByTimestampDesc();
 }

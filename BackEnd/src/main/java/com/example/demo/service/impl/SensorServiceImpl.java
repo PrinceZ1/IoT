@@ -34,50 +34,31 @@ public class SensorServiceImpl implements SensorService {
         Integer light = params.containsKey("light") ? Integer.valueOf(params.get("light").toString()) : null;
         Integer wind = params.containsKey("wind") ? Integer.valueOf(params.get("wind").toString()) : null;
 
-        Integer year = null;
-        Integer month = null;
-        Integer day = null;
-        Integer hour = null;
-        Integer minute = null;
+        LocalDateTime exactTimestamp = null;
 
         // Kiểm tra và xử lý tham số timestamp
         if (params.containsKey("timestamp")) {
             String timestampParam = params.get("timestamp").toString();
 
-            // Nếu chỉ chứa ngày tháng năm (yyyy-MM-dd)
-            if (timestampParam.matches("\\d{4}-\\d{2}-\\d{2}")) {
-                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                LocalDate date = LocalDate.parse(timestampParam, dateFormatter);
-                year = date.getYear();
-                month = date.getMonthValue();
-                day = date.getDayOfMonth();
-            }
-
-            // Nếu chỉ chứa giờ và phút (HH:mm)
-            if (timestampParam.matches("\\d{2}:\\d{2}")) {
-                DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-                LocalTime time = LocalTime.parse(timestampParam, timeFormatter);
-                hour = time.getHour();
-                minute = time.getMinute();
-            }
+            // Nếu timestamp có định dạng "dd/MM/yyyy, HH:mm:ss"
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy, HH:mm:ss");
+            exactTimestamp = LocalDateTime.parse(timestampParam, dateTimeFormatter);
         }
 
-        // Lấy pageSize và pageNumber từ params
+        // Get pageSize and pageNumber from params
         int pageSize = params.containsKey("pageSize") ? Integer.parseInt(params.get("pageSize").toString()) : 10;
         int pageNumber = params.containsKey("pageNumber") ? Integer.parseInt(params.get("pageNumber").toString()) : 0;
 
-        // Xử lý sắp xếp
+        // Handle sorting
         String sortBy = params.containsKey("sortBy") ? params.get("sortBy").toString() : "timestamp";
         String sortDirection = params.containsKey("sortDirection") ? params.get("sortDirection").toString() : "desc";
-
-        // Sử dụng Sort.Direction.fromString() để tạo Sort object
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
-        // Gọi repository với Pageable và các điều kiện
-        Page<SensorEntity> sensorEntities = sensorRepository.findByParams(
-                temperature, humidity, light, wind, year, month, day, hour, pageable
+        // Gọi repository với Pageable và điều kiện chính xác
+        Page<SensorEntity> sensorEntities = sensorRepository.findByExactTimestamp(
+                temperature, humidity, light, wind, exactTimestamp, pageable
         );
 
         // Chuyển đổi từ Page<SensorEntity> sang List<SensorDTO>
@@ -93,6 +74,7 @@ public class SensorServiceImpl implements SensorService {
 
         return response;
     }
+
 
     @Override
     public SensorDTO getLatestSensorData() {

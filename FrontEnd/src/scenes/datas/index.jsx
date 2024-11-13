@@ -130,6 +130,16 @@ const Datas = () => {
     setPage(1); // Reset về trang đầu khi thay đổi kích thước trang
   };
 
+  // Hàm Reset để trở về trạng thái ban đầu
+  const handleReset = () => {
+    setFilterField(""); // Xóa trường tìm kiếm
+    setInputValue(""); // Xóa giá trị tìm kiếm
+    setSortDirection(""); // Xóa sắp xếp
+    setFilterValues({ temperature: "", humidity: "", light: "", timestamp: "" }); // Xóa các bộ lọc cụ thể
+    setPage(1); // Đặt lại trang đầu tiên
+    fetchData(); // Gọi lại API để tải dữ liệu ban đầu
+  };
+
   return (
     <Box m="20px">
       <h1>Data Sensor</h1>
@@ -171,6 +181,9 @@ const Datas = () => {
         </Select>
         <Button variant="contained" color="primary" onClick={handleSearch}>
           Search
+        </Button>
+        <Button variant="outlined" color="secondary" onClick={handleReset} style={{ marginLeft: "10px" }}>
+          Reset
         </Button>
       </Box>
 

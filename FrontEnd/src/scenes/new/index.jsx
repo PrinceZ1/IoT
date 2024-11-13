@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { Box, Typography, useTheme } from "@mui/material";
 import { Header } from "../../components";
@@ -21,47 +21,50 @@ const NewTab = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  // State để lưu dữ liệu cảm biến
+  // State để lưu dữ liệu cảm biến hiện tại và lịch sử tốc độ gió
   const [sensorData, setSensorData] = useState({
     wind: null,
     warning: false,
   });
+  const [windHistory, setWindHistory] = useState(() => {
+    const savedHistory = localStorage.getItem("windHistory");
+    return savedHistory ? JSON.parse(savedHistory) : [];
+  });
 
-  // Fetch dữ liệu cảm biến
+  // Dùng ref để tránh gọi API liên tục khi chuyển tab
+  const hasFetchedData = useRef(false);
+
   useEffect(() => {
-    let isMounted = true;
-
     const fetchSensorData = async () => {
       try {
-        // Gọi API để lấy dữ liệu wind
         const windResponse = await axios.get("http://localhost:8080/sensor/latest");
-
-        // Gọi API để lấy trạng thái warning từ backend
         const statusResponse = await axios.get("http://localhost:8080/led/status");
 
-        if (isMounted) {
-          const { wind } = windResponse.data;
+        const { wind } = windResponse.data;
+        const warningStatus = statusResponse.data.warning;
+        const warning = warningStatus === "on";
 
-          // Lấy trạng thái warning từ statusResponse
-          const warningStatus = statusResponse.data.warning;
+        setSensorData({ wind, warning });
 
-          // Chuyển đổi warningStatus thành boolean
-          const warning = warningStatus === "on";
-
-          setSensorData({ wind, warning });
-        }
+        // Cập nhật windHistory và lưu vào localStorage chỉ khi có dữ liệu mới
+        setWindHistory((prevHistory) => {
+          const newHistory = [
+            ...prevHistory.slice(-9), // Giữ lại tối đa 10 dữ liệu cuối
+            { time: new Date().toLocaleTimeString(), wind },
+          ];
+          localStorage.setItem("windHistory", JSON.stringify(newHistory));
+          return newHistory;
+        });
       } catch (error) {
         console.error("Error fetching sensor data:", error);
       }
     };
 
-    fetchSensorData();
+    fetchSensorData(); // Gọi lần đầu tiên ngay khi component được mount
     const intervalId = setInterval(fetchSensorData, 1000);
 
-    return () => {
-      isMounted = false;
-      clearInterval(intervalId);
-    };
+    // Xóa interval khi component bị unmount
+    return () => clearInterval(intervalId);
   }, []);
 
   // Hàm để lấy màu sắc dựa trên tốc độ gió
@@ -131,7 +134,7 @@ const NewTab = () => {
             Wind Speed Over Time
           </Typography>
           <Box flexGrow={1} mt="20px">
-            <WindLineChart />
+            <WindLineChart data={windHistory} /> {/* Truyền windHistory qua props */}
           </Box>
         </Box>
 
@@ -155,7 +158,6 @@ const NewTab = () => {
               color: sensorData.warning ? "#ffeb3b" : colors.gray[100],
               fontSize: "128px",
               marginBottom: "16px",
-              // Áp dụng animation nhấp nháy khi warning hoạt động
               ...(sensorData.warning && {
                 animation: `${blinkAnimation} 1s infinite`,
               }),

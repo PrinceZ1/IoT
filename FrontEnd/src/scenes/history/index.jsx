@@ -18,10 +18,8 @@ const History = () => {
   const [loading, setLoading] = React.useState(false); // Trạng thái tải
   const [error, setError] = React.useState(null); // Trạng thái lỗi
 
-  // Trạng thái cho các trường tìm kiếm
-  const [deviceName, setDeviceName] = React.useState(""); 
-  const [active, setActive] = React.useState(""); 
-  const [timestamp, setTimestamp] = React.useState(""); 
+  // Trạng thái cho các trường tìm kiếm và sắp xếp
+  const [filterField, setFilterField] = React.useState(""); // Trường cần tìm kiếm
   const [sortDirection, setSortDirection] = React.useState(""); // Trạng thái sắp xếp
   const [inputValue, setInputValue] = React.useState(""); // Giá trị nhập vào
 
@@ -33,10 +31,9 @@ const History = () => {
       const params = {
         pageNumber: page - 1, // Điều chỉnh để gửi đúng `pageNumber` cho API
         pageSize,
-        deviceName: deviceName || undefined, // Thêm tìm kiếm theo deviceName
-        active: active || undefined, // Thêm tìm kiếm theo active
-        timestamp: timestamp || undefined, // Thêm tìm kiếm theo timestamp
-        sortDirection: sortDirection || undefined, // Thêm sắp xếp
+        [filterField]: inputValue || undefined, // Tìm kiếm theo trường đã chọn và giá trị nhập
+        sortBy: filterField || undefined, // Sắp xếp theo trường đã chọn
+        sortDirection: sortDirection || undefined, // Hướng sắp xếp
       };
 
       const response = await axios.get("http://localhost:8080/led", { params });
@@ -60,10 +57,10 @@ const History = () => {
     }
   };
 
-  // Gọi fetchHistoryData khi tải trang hoặc thay đổi page/pageSize/tìm kiếm
+  // Gọi fetchHistoryData khi tải trang hoặc thay đổi page/pageSize/filterField/sortDirection
   React.useEffect(() => {
     fetchHistoryData();
-  }, [page, pageSize, deviceName, active, timestamp, sortDirection]);
+  }, [page, pageSize, filterField, inputValue, sortDirection]);
 
   // Cấu hình các cột
   const columns = [
@@ -84,12 +81,14 @@ const History = () => {
     setPage(1); // Reset về trang đầu khi thay đổi kích thước trang
   };
 
-  // Xử lý khi thay đổi tìm kiếm deviceName, active hoặc timestamp
-  const handleSearchChange = (field, value) => {
-    if (field === "deviceName") setDeviceName(value);
-    if (field === "active") setActive(value);
-    if (field === "timestamp") setTimestamp(value);
+  // Xử lý khi thay đổi tìm kiếm (field và giá trị)
+  const handleFilterFieldChange = (event) => {
+    setFilterField(event.target.value);
     setPage(1); // Reset về trang đầu sau khi tìm kiếm
+  };
+
+  const handleInputChange = (event) => {
+    setInputValue(event.target.value);
   };
 
   // Xử lý khi thay đổi sortDirection
@@ -97,9 +96,13 @@ const History = () => {
     setSortDirection(event.target.value);
   };
 
-  // Xử lý khi người dùng bấm nút tìm kiếm
-  const handleSearch = () => {
-    fetchHistoryData();
+  // Hàm Reset để trở về trạng thái ban đầu
+  const handleReset = () => {
+    setFilterField(""); // Xóa trường tìm kiếm
+    setInputValue(""); // Xóa giá trị tìm kiếm
+    setSortDirection(""); // Xóa sắp xếp
+    setPage(1); // Đặt lại trang đầu tiên
+    fetchHistoryData(); // Gọi lại API để tải dữ liệu ban đầu
   };
 
   return (
@@ -112,12 +115,12 @@ const History = () => {
           label="Enter Value"
           variant="outlined"
           value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+          onChange={handleInputChange}
           style={{ marginRight: "20px" }}
         />
         <Select
-          value={deviceName}
-          onChange={(e) => handleSearchChange("deviceName", e.target.value)}
+          value={filterField}
+          onChange={handleFilterFieldChange}
           displayEmpty
           style={{ marginRight: "20px" }}
         >
@@ -140,8 +143,11 @@ const History = () => {
           <MenuItem value="asc">Asc</MenuItem>
           <MenuItem value="desc">Desc</MenuItem>
         </Select>
-        <Button variant="contained" color="primary" onClick={handleSearch}>
+        <Button variant="contained" color="primary" onClick={fetchHistoryData}>
           Search
+        </Button>
+        <Button variant="outlined" color="secondary" onClick={handleReset} style={{ marginLeft: "10px" }}>
+          Reset
         </Button>
       </Box>
 

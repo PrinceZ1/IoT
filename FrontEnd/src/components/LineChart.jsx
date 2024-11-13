@@ -1,5 +1,6 @@
-/* eslint-disable react/prop-types */
-import { useState, useEffect } from "react";
+// LineChartComponent.js
+
+import React from "react";
 import {
   LineChart,
   Line,
@@ -13,38 +14,9 @@ import {
 import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
 
-const LineChartComponent = ({ isDashboard = false }) => {
+const LineChartComponent = ({ data, isDashboard = false }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
-  const [data, setData] = useState([]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetch("http://localhost:8080/sensor/latest")
-        .then((response) => response.json())
-        .then((sensorData) => {
-          const { temperature, humidity, light } = sensorData;
-
-          setData((prevData) =>
-            [
-              ...prevData,
-              {
-                time: new Date().toLocaleTimeString(),
-                temperature,
-                humidity,
-                light,
-              },
-            ].slice(-7)
-          );
-        })
-        .catch((error) => {
-          console.error("Error fetching data from API:", error);
-        });
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
@@ -84,15 +56,9 @@ const LineChartComponent = ({ isDashboard = false }) => {
 
   return (
     <ResponsiveContainer width="100%" height={300}>
-      <LineChart
-        data={data}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-      >
+      <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" stroke={colors.gray[400]} />
-        <XAxis
-          dataKey="time"
-          tick={{ fill: colors.gray[100], fontSize: 12 }}
-        />
+        <XAxis dataKey="time" tick={{ fill: colors.gray[100], fontSize: 12 }} />
         <YAxis
           yAxisId="left"
           domain={[0, 100]}

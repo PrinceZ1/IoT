@@ -35,7 +35,6 @@ public class MqttConfig {
         client.subscribe("fan", this::handleDeviceMessage);
         client.subscribe("airConditioner", this::handleDeviceMessage);
         client.subscribe("lightbulb", this::handleDeviceMessage);
-        client.subscribe("warning", this::handleDeviceMessage);
         return client;
     }
 

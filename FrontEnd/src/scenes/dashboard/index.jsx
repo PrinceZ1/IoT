@@ -137,6 +137,54 @@ const getTemperatureColor = (temp) => {
     light: null,
   });
 
+  // State lưu trữ lịch sử dữ liệu cảm biến
+const [sensorDataHistory, setSensorDataHistory] = useState(() => {
+  const savedHistory = localStorage.getItem("sensorDataHistory");
+  return savedHistory ? JSON.parse(savedHistory) : [];
+});
+
+// Cập nhật dữ liệu cảm biến và lưu lịch sử vào localStorage
+useEffect(() => {
+  let isMounted = true;
+
+  const fetchSensorData = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/sensor/latest");
+      if (isMounted) {
+        const { temperature, humidity, light } = response.data;
+        setSensorData({ temperature, humidity, light });
+
+        // Cập nhật lịch sử dữ liệu
+        setSensorDataHistory((prevHistory) => {
+          const newHistory = [
+            ...prevHistory.slice(-6),
+            {
+              time: new Date().toLocaleTimeString(),
+              temperature,
+              humidity,
+              light,
+            },
+          ];
+          // Lưu lịch sử vào localStorage
+          localStorage.setItem("sensorDataHistory", JSON.stringify(newHistory));
+          return newHistory;
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching sensor data:", error);
+    }
+  };
+
+  fetchSensorData();
+  const intervalId = setInterval(fetchSensorData, 5000);
+
+  return () => {
+    isMounted = false;
+    clearInterval(intervalId);
+  };
+}, []);
+
+
   // Fetch device status when component mounts
   useEffect(() => {
     let isMounted = true;
@@ -385,7 +433,7 @@ const getTemperatureColor = (temp) => {
             justifyContent="space-between"
           ></Box>
           <Box height="250px" mt="-20px">
-            <LineChart isDashboard={true} />
+          <LineChart data={sensorDataHistory} isDashboard={true} />
           </Box>
         </Box>
 

@@ -40,32 +40,15 @@ public class LedServiceImpl implements LedService {
         String deviceName = params.containsKey("deviceName") ? params.get("deviceName").toString() : null;
         String active = params.containsKey("active") ? params.get("active").toString() : null;
 
-        Integer year = null;
-        Integer month = null;
-        Integer day = null;
-        Integer hour = null;
-        Integer minute = null;
+        LocalDateTime exactTimestamp = null;
 
-        // Check and handle timestamp parameter
+        // Kiểm tra và xử lý tham số timestamp
         if (params.containsKey("timestamp")) {
             String timestampParam = params.get("timestamp").toString();
 
-            // If only date is provided (yyyy-MM-dd)
-            if (timestampParam.matches("\\d{4}-\\d{2}-\\d{2}")) {
-                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                LocalDate date = LocalDate.parse(timestampParam, dateFormatter);
-                year = date.getYear();
-                month = date.getMonthValue();
-                day = date.getDayOfMonth();
-            }
-
-            // If only time is provided (HH:mm)
-            if (timestampParam.matches("\\d{2}:\\d{2}")) {
-                DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-                LocalTime time = LocalTime.parse(timestampParam, timeFormatter);
-                hour = time.getHour();
-                minute = time.getMinute();
-            }
+            // Nếu timestamp có định dạng "dd/MM/yyyy, HH:mm:ss"
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy, HH:mm:ss");
+            exactTimestamp = LocalDateTime.parse(timestampParam, dateTimeFormatter);
         }
 
         // Get pageSize and pageNumber from params
@@ -79,15 +62,15 @@ public class LedServiceImpl implements LedService {
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
-        // Call repository with Pageable and conditions
-        Page<LedEntity> ledEntities = ledRepository.findByParams(
-                deviceName, active, year, month, day, hour, minute, pageable
+        // Gọi repository với Pageable và điều kiện tìm kiếm
+        Page<LedEntity> ledEntities = ledRepository.findByExactTimestamp(
+                deviceName, active, exactTimestamp, pageable
         );
 
-        // Convert Page<LedEntity> to List<LedDTO>
+        // Chuyển đổi Page<LedEntity> thành List<LedDTO>
         List<LedDTO> ledDTOs = ledDTOConverter.toLedDTOs(ledEntities.getContent());
 
-        // Create response map with pagination info
+        // Tạo response map với thông tin phân trang
         Map<String, Object> response = new HashMap<>();
         response.put("content", ledDTOs);
         response.put("currentPage", ledEntities.getNumber() + 1);
@@ -96,6 +79,7 @@ public class LedServiceImpl implements LedService {
 
         return response;
     }
+
 
     @Override
     public Map<String, String> getCurrentDeviceStatuses() {

@@ -24,7 +24,7 @@ const LineChartComponent = ({ isDashboard = false }) => {
       fetch("http://localhost:8080/sensor/latest")
         .then((response) => response.json())
         .then((sensorData) => {
-          const { temperature, humidity, light, wind } = sensorData;
+          const { temperature, humidity, light } = sensorData;
 
           setData((prevData) =>
             [
@@ -34,9 +34,8 @@ const LineChartComponent = ({ isDashboard = false }) => {
                 temperature,
                 humidity,
                 light,
-                wind,
               },
-            ].slice(-5)
+            ].slice(-7)
           );
         })
         .catch((error) => {
@@ -52,7 +51,6 @@ const LineChartComponent = ({ isDashboard = false }) => {
       const temperaturePayload = payload.find((p) => p.dataKey === "temperature");
       const humidityPayload = payload.find((p) => p.dataKey === "humidity");
       const lightPayload = payload.find((p) => p.dataKey === "light");
-      const windPayload = payload.find((p) => p.dataKey === "wind");
 
       return (
         <div
@@ -77,9 +75,6 @@ const LineChartComponent = ({ isDashboard = false }) => {
           </p>
           <p style={{ color: "#FFEB3B", fontSize: "12px" }}>
             {`Light: ${lightPayload ? lightPayload.value : "N/A"} Lux`}
-          </p>
-          <p style={{ color: "#00C49F", fontSize: "12px" }}>
-            {`Wind: ${windPayload ? windPayload.value : "N/A"} m/s`}
           </p>
         </div>
       );
@@ -109,20 +104,6 @@ const LineChartComponent = ({ isDashboard = false }) => {
           domain={[0, 1000]}
           tick={{ fill: colors.gray[100], fontSize: 12 }}
         />
-        <YAxis
-          yAxisId="windAxis"
-          orientation="right"
-          domain={[0, 100]}
-          axisLine={false}
-          tickLine={false}
-          tick={{ fill: colors.gray[100], fontSize: 12 }}
-          label={{
-            value: "Wind (m/s)",
-            angle: 90,
-            position: "insideRight",
-            fill: colors.gray[100],
-          }}
-        />
         <Tooltip content={<CustomTooltip />} />
         <Legend verticalAlign="top" align="right" />
         <Line
@@ -148,14 +129,6 @@ const LineChartComponent = ({ isDashboard = false }) => {
           stroke="#FFEB3B"
           activeDot={{ r: 8 }}
           dot={{ stroke: "#FFEB3B", strokeWidth: 2 }}
-        />
-        <Line
-          yAxisId="windAxis"
-          type="monotone"
-          dataKey="wind"
-          stroke="#00C49F"
-          activeDot={{ r: 8 }}
-          dot={{ stroke: "#00C49F", strokeWidth: 2 }}
         />
       </LineChart>
     </ResponsiveContainer>

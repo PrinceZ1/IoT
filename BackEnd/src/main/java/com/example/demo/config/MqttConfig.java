@@ -35,7 +35,7 @@ public class MqttConfig {
         client.subscribe("fan", this::handleDeviceMessage);
         client.subscribe("airConditioner", this::handleDeviceMessage);
         client.subscribe("lightbulb", this::handleDeviceMessage);
-        client.subscribe("warningLight", this::handleDeviceMessage);
+        client.subscribe("warning", this::handleDeviceMessage);
         return client;
     }
 
@@ -60,7 +60,6 @@ public class MqttConfig {
     private void handleDeviceMessage(String topic, MqttMessage message) {
         String payload = new String(message.getPayload());
         System.out.println("Received command on topic [" + topic + "]: " + payload);
-        // Xử lý lệnh điều khiển thiết bị nếu cần
-        // Bạn có thể cập nhật trạng thái thiết bị trong cơ sở dữ liệu hoặc thực hiện hành động khác
+
     }
 }

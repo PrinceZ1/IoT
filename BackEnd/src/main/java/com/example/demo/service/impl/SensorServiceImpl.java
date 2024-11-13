@@ -77,7 +77,7 @@ public class SensorServiceImpl implements SensorService {
 
         // Gọi repository với Pageable và các điều kiện
         Page<SensorEntity> sensorEntities = sensorRepository.findByParams(
-                temperature, humidity, light, year, month, day, hour, minute, pageable
+                temperature, humidity, light, wind, year, month, day, hour, pageable
         );
 
         // Chuyển đổi từ Page<SensorEntity> sang List<SensorDTO>

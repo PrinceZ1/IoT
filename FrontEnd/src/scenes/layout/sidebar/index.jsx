@@ -100,7 +100,7 @@ const SideBar = () => {
             <Typography
               variant="h6"
               fontWeight="500"
-              color={colors.redAccent[400]}
+              color={colors.redAccent[300]}
             >
               B21DCCN569
             </Typography>
@@ -155,6 +155,12 @@ const SideBar = () => {
             path="/profile"
             colors={colors}
             icon={<PeopleAltOutlined />}
+          />
+          <Item
+            title="New"
+            path="/new"
+            colors={colors}
+            icon={<AnalyticsOutlined />}
           />
         </Menu>
         <Menu

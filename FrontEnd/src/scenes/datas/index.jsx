@@ -22,7 +22,6 @@ const Datas = () => {
     temperature: "",
     humidity: "",
     light: "",
-    wind: "",
     timestamp: "",
   });
   const [filterField, setFilterField] = React.useState(""); // Lựa chọn filter
@@ -44,7 +43,6 @@ const Datas = () => {
         params.temperature = filterValues.temperature;
       if (filterValues.humidity) params.humidity = filterValues.humidity;
       if (filterValues.light) params.light = filterValues.light;
-      if (filterValues.wind) params.wind = filterValues.wind;
       if (filterValues.timestamp) params.timestamp = filterValues.timestamp;
       if (filterField && inputValue) params[filterField] = inputValue;
       if (sortDirection) {
@@ -62,7 +60,6 @@ const Datas = () => {
         temperature: `${item.temperature}℃`,
         humidity: `${item.humidity}%`,
         light: `${item.light} Lux`,
-        wind: `${item.wind} m/s`, // Thêm dòng này
         timestamp: new Date(item.timestamp).toLocaleString("en-GB"), // Định dạng thời gian
       }));
 
@@ -97,7 +94,6 @@ const Datas = () => {
     { field: "temperature", headerName: "Temperature (℃)", flex: 1 },
     { field: "humidity", headerName: "Humidity (%)", flex: 1 },
     { field: "light", headerName: "Light (Lux)", flex: 1 },
-    { field: "wind", headerName: "Wind (m/s)", flex: 1 }, // Thêm cột này
     { field: "timestamp", headerName: "Timestamp", flex: 1 },
   ];
 
@@ -159,7 +155,6 @@ const Datas = () => {
           <MenuItem value="temperature">Temperature</MenuItem>
           <MenuItem value="humidity">Humidity</MenuItem>
           <MenuItem value="light">Light</MenuItem>
-          <MenuItem value="wind">Wind</MenuItem> {/* Thêm lựa chọn này */}
           <MenuItem value="timestamp">Timestamp</MenuItem>
         </Select>
         <Select

@@ -90,7 +90,7 @@ const Profile = () => {
             {
               icon: faFilePdf,
               label: "PDF",
-              href: "https://www.google.com/",
+              href: "https://drive.google.com/file/d/1hkqvbpzKIYvK7X9ji9MBZ6T6hmFRmrwl/view?usp=sharing",
             },
             {
               icon: faGithub,

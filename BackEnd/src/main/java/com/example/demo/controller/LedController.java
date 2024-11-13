@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.CountResponse;
 import com.example.demo.model.LedDTO;
 import com.example.demo.service.LedService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,11 @@ public class LedController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @GetMapping("/led/status")
+    public ResponseEntity<Map<String, String>> getDeviceStatuses() {
+        Map<String, String> statuses = ledService.getCurrentDeviceStatuses();
+        return ResponseEntity.ok(statuses);
+    }
 
     @PostMapping("/led/control")
     public ResponseEntity<String> ledControl(@RequestBody LedDTO ledDTO){
@@ -31,11 +35,5 @@ public class LedController {
         } catch (Exception e) {
             return new ResponseEntity<>("Điều khiển LED không thành công. Lỗi: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
-    @GetMapping("/led/warningCount")
-    public ResponseEntity<CountResponse> getWarningCount() {
-        int count = ledService.getWarningCountForToday();
-        CountResponse response = new CountResponse(count);
-        return ResponseEntity.ok(response);
     }
 }

@@ -7,8 +7,7 @@ import java.util.Map;
 
 public interface LedService {
     Map<String, Object> getLed(Map<String, Object> params);
+    Map<String, String> getCurrentDeviceStatuses();
     ResponseEntity<String> controlLed(String deviceName, String action);
     void saveLedData(LedEntity ledData);
-
-    int getWarningCountForToday();
 }

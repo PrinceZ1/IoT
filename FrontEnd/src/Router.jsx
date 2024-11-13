@@ -7,6 +7,7 @@ import {
   History,
   Profile
 } from "./scenes";
+import NewTab from "./scenes/new";
 
 const AppRouter = () => {
   return (
@@ -17,6 +18,7 @@ const AppRouter = () => {
           <Route path="/datas" element={<Datas />} />
           <Route path="/history" element={<History />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/new" element={<NewTab />} />
         </Route>
       </Routes>
     </Router>
